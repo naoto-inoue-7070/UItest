@@ -1,0 +1,67 @@
+VERSION "Sample DBC "
+
+NS_ :
+    NS_DESC_
+    CM_
+    BA_DEF_
+    BA_
+    VAL_
+    CAT_DEF_
+    CAT_
+    FILTER_
+    BA_DEF_DEF_
+    EV_DATA_
+    ENVVAR_DATA_
+    SGTYPE_
+    SGTYPE_VAL_
+    BA_DEF_SGTYPE_
+    BA_SGTYPE_
+    SIG_TYPE_REF_
+    VAL_TABLE_
+    SIG_GROUP_
+    SIG_VALTYPE_
+    SIGTYPE_VALTYPE_
+    BO_TX_BU_
+    BA_DEF_REL_
+    BA_REL_
+    BA_DEF_DEF_REL_
+    BU_SG_REL_
+    BU_EV_REL_
+    BU_BO_REL_
+    SG_MUL_VAL_
+
+BS_:
+
+BU_: BRK MET ADS
+
+CM_ "Sample DBC: BRK ECU sends meter_lamp_state via BRK_MODE to MET and ADS. All parameters are provisional.";
+
+CM_ BU_ BRK "Brake ECU (sender of BRK_MODE)";
+CM_ BU_ MET "Meter/Cluster ECU (receiver)";
+CM_ BU_ ADS "ADAS ECU (receiver)";
+
+BO_ 291 BRK_MODE: 8 BRK
+  CM_ BO_ 291 "Provisional frame: standard CAN ID 0x123 (decimal 291), DLC 8, cyclic 10ms.";
+  SG_METER_LAMP_STATE : 0|2@1+ (1,0) [0|3] ""  MET,ADS
+  CM_ SG_ 291 meter_lamp_state "2-bit lamp state: 0=Off, 1=On, 2=Blink, 3=Fault (provisional mapping)";
+
+VAL_ 291 meter_lamp_state 0 "Off" 1 "On" 2 "Blink" 3 "Fault";
+
+BA_DEF_  "GenMsgCycleTime" INT 0 60000;
+BA_DEF_  "GenMsgSendType" ENUM  "Cyclic","IfActive","Spontaneous";
+BA_DEF_  "BusType" STRING;
+BA_DEF_  "ProtocolType" STRING;
+
+BA_ "BusType" "CAN";
+BA_ "ProtocolType" "CAN 2.0B";
+
+BA_ "GenMsgCycleTime" BO_ 291 10;
+BA_ "GenMsgSendType" BO_ 291 "Cyclic";
+
+CM_ "Bit/byte layout note:
+- meter_lamp_state is little-endian (Intel) '@1', start bit 0, length 2, unsigned '+'
+- Physical value = raw (factor=1, offset=0), range 0..3
+- Receivers: MET, ADS
+";
+
+``
